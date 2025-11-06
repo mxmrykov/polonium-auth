@@ -65,18 +65,4 @@ const (
 </body>
 </html>
 	`
-	VerificationCodePlain = `
-Email Verification
-
-Hello!
-
-Thank you for registering! To complete your verification, please use the following 6-digit verification code:
-
-%s
-
-This code will expire in 5 minutes. If you didn't request this verification, please ignore this email.
-
-Best regards,
-polonium.ws
-`
 )

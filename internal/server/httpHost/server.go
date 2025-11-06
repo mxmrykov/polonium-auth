@@ -12,6 +12,7 @@ type (
 	IServer interface {
 		Start() error
 		Stop(ctx context.Context) error
+		Router() *gin.Engine
 	}
 
 	Server struct {
@@ -41,4 +42,8 @@ func (s *Server) Start() error {
 
 func (s *Server) Stop(ctx context.Context) error {
 	return s.server.Shutdown(ctx)
+}
+
+func (s *Server) Router() *gin.Engine {
+	return s.router
 }

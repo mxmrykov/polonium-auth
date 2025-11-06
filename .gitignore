@@ -25,8 +25,13 @@ go.work
 go.work.sum
 
 # env file
-.env
+migrations/.env
 
 # Editor/IDE
-# .idea/
+ .idea/
 # .vscode/
+modules.xml
+polonium-auth.iml
+vcs.xml
+dataSources.xml
+goose
