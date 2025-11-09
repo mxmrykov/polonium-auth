@@ -1,39 +1,49 @@
 package app
 
 import (
+	"fmt"
+	"math/rand"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mxmrykov/polonium-auth/internal/auth"
 	"github.com/mxmrykov/polonium-auth/internal/repository"
 	"github.com/mxmrykov/polonium-auth/internal/server/httpHost/handlers"
 	"github.com/mxmrykov/polonium-auth/internal/server/httpHost/middlewares"
 	"github.com/mxmrykov/polonium-auth/internal/service"
+	"github.com/mxmrykov/polonium-auth/pkg/utils"
 )
 
 func (a *Application) setupRoutesAPIV1(
-	authPg repository.IAuthPostgres,
-	authRdb repository.IAuthRedis,
-	emailer repository.IEmailer,
+	repositories *repositories,
+	jProcessor *auth.JWTProcessor,
 ) {
 	apiV1 := a.httpServer.Router().Group("/ext-auth/api/v1")
 
+	// ---===Middlewares, global setup===---
 	{
 		apiV1.Use(gin.Recovery(), middlewares.LogMW(), middlewares.CorsMW())
 		apiV1.OPTIONS("*any", func(c *gin.Context) {
 			c.Writer.WriteHeader(http.StatusOK)
 		})
-		apiV1.Use(middlewares.AuthMW())
+		apiV1.Use(middlewares.AuthMW(jProcessor, repositories.authRdb))
 	}
 
+	// ---===Routing===---
 	{
-		authService := service.NewAuth(
-			authPg,
-			authRdb,
-			emailer,
-		)
-		extAuthHandlers := handlers.NewExtAuth(authService)
-		apiV1.POST("/signup/general/check", extAuthHandlers.SignupCheck)
-		apiV1.POST("/signup/email/check", extAuthHandlers.SignupConfirmEmail)
+		signupGroup := apiV1.Group("/signup")
+		authService, totpService := service.NewAuth(
+			repositories.authPg,
+			repositories.authRdb,
+			repositories.emailer,
+			repositories.vault,
+		), service.NewTOTP(repositories.vault)
+		extAuthHandlers := handlers.NewExtAuth(authService, totpService)
+
+		signupGroup.POST("/general/check", extAuthHandlers.SignupCheck)
+		signupGroup.POST("/email/check", extAuthHandlers.SignupConfirmEmail)
+		signupGroup.POST("/general/qr", extAuthHandlers.GetQRCode)
+		signupGroup.POST("/general/verify", extAuthHandlers.CompleteSignup)
 	}
 }
 
@@ -45,10 +55,29 @@ func (a *Application) initRepositories() (*repositories, error) {
 
 	authRedisRepo := repository.NewAuthRedis(&a.cfg.Redis)
 	emailer := repository.NewEmailer(&a.cfg.Smtp)
+	vault, err := repository.NewAuthVault(&a.cfg.Vault)
+	if err != nil {
+		return nil, err
+	}
 
 	return &repositories{
 		authPg:  authPostgresRepo,
 		authRdb: authRedisRepo,
 		emailer: emailer,
+		vault:   vault,
 	}, nil
+}
+
+func (a *Application) initJwtProcessor() (*auth.JWTProcessor, error) {
+	rsa, err := utils.GenerateRSAKeys(rand.Intn(999))
+	if err != nil {
+		return nil, fmt.Errorf("cannot init RSA keys: %v", err)
+	}
+
+	return auth.NewRSAJWTProcessor(
+		rsa.PrivateKey, rsa.PublicKey,
+		a.cfg.Auth.Access,
+		a.cfg.Auth.Refresh,
+		a.cfg.Auth.Issuer,
+	), nil
 }

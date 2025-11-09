@@ -19,6 +19,7 @@ type (
 		authPg  repository.IAuthPostgres
 		authRdb repository.IAuthRedis
 		emailer repository.IEmailer
+		vault   repository.IAuthVault
 	}
 )
 
@@ -30,12 +31,16 @@ func New(cfg *config.PAuth) (*Application, error) {
 	}
 
 	repos, err := a.initRepositories()
-
 	if err != nil {
 		return nil, fmt.Errorf("cannot init app: %v", err)
 	}
 
-	a.setupRoutesAPIV1(repos.authPg, repos.authRdb, repos.emailer)
+	jwtProcessor, err := a.initJwtProcessor()
+	if err != nil {
+		return nil, fmt.Errorf("cannot init jwt processor: %v", err)
+	}
+
+	a.setupRoutesAPIV1(repos, jwtProcessor)
 
 	return a, nil
 }

@@ -6,13 +6,16 @@ import (
 
 	"github.com/mxmrykov/polonium-auth/internal/config"
 	"github.com/mxmrykov/polonium-auth/internal/provider"
+	"github.com/mxmrykov/polonium-auth/internal/vars"
 )
 
 type (
 	IAuthRedis interface {
-		HasActiveSignupSession(user string) (bool, error)
+		HasActiveECSession(user string) (bool, error)
 		SetCode(user, code string) error
+		GetCode(user string) (string, error)
 		DropCode(user string) error
+		NewAuthSession(user, session string) error
 	}
 
 	authRedis struct {
@@ -26,8 +29,8 @@ func NewAuthRedis(cfg *config.Redis) IAuthRedis {
 	}
 }
 
-func (a *authRedis) HasActiveSignupSession(user string) (bool, error) {
-	key := fmt.Sprintf("codes/signup/email-confirmation/%s", user)
+func (a *authRedis) HasActiveECSession(user string) (bool, error) {
+	key := fmt.Sprintf(vars.CodesSignupEmailConfirmation, user)
 
 	exists, err := a.rdb.IsExists(key)
 
@@ -39,11 +42,21 @@ func (a *authRedis) HasActiveSignupSession(user string) (bool, error) {
 }
 
 func (a *authRedis) SetCode(user, code string) error {
-	key := fmt.Sprintf("codes/signup/email-confirmation/%s", user)
+	key := fmt.Sprintf(vars.CodesSignupEmailConfirmation, user)
 	return a.rdb.Set(key, code, 2*time.Minute)
 }
 
+func (a *authRedis) GetCode(user string) (string, error) {
+	key := fmt.Sprintf(vars.CodesSignupEmailConfirmation, user)
+	return a.rdb.Get(key)
+}
+
 func (a *authRedis) DropCode(user string) error {
-	key := fmt.Sprintf("codes/signup/email-confirmation/%s", user)
+	key := fmt.Sprintf(vars.CodesSignupEmailConfirmation, user)
 	return a.rdb.Drop(key)
+}
+
+func (a *authRedis) NewAuthSession(user, session string) error {
+	key := fmt.Sprintf(vars.AuthSessionsUsers, user)
+	return a.rdb.Set(key, session, time.Hour)
 }

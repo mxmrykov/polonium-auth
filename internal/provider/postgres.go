@@ -53,8 +53,7 @@ func (p *PostgresProvider) Close() {
 }
 
 type PostgresPool struct {
-	master  *PostgresProvider
-	replica *PostgresProvider
+	master *PostgresProvider
 }
 
 func NewPostgresPool(poolCfg *config.Psql) (*PostgresPool, error) {

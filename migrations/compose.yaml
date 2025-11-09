@@ -23,8 +23,23 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass OWFhYWRkYzctMzIxYy00YjFk
+  vault:
+    image: hashicorp/vault:1.16.0
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=root-token
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+      - VAULT_ADDR=http://0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault_data:/vault/data
+    command: server -dev -dev-listen-address=0.0.0.0:8200 -dev-no-store-token
 
 volumes:
   postgres_data:
   redis_data:
+  vault_data:

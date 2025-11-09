@@ -17,7 +17,227 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel(in *jlexer.Lexer, out *SignupCheckRequest) {
+func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel(in *jlexer.Lexer, out *User) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		switch key {
+		case "Email":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Email = string(in.String())
+			}
+		case "Id":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Id = string(in.String())
+			}
+		case "SshSign":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.SshSign = string(in.String())
+			}
+		case "Deployer":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Deployer = string(in.String())
+			}
+		case "Verified":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Verified = bool(in.Bool())
+			}
+		case "Banned":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Banned = bool(in.Bool())
+			}
+		case "CreateDt":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				if data := in.Raw(); in.Ok() {
+					in.AddError((out.CreateDt).UnmarshalJSON(data))
+				}
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel(out *jwriter.Writer, in User) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"Email\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.Email))
+	}
+	{
+		const prefix string = ",\"Id\":"
+		out.RawString(prefix)
+		out.String(string(in.Id))
+	}
+	{
+		const prefix string = ",\"SshSign\":"
+		out.RawString(prefix)
+		out.String(string(in.SshSign))
+	}
+	{
+		const prefix string = ",\"Deployer\":"
+		out.RawString(prefix)
+		out.String(string(in.Deployer))
+	}
+	{
+		const prefix string = ",\"Verified\":"
+		out.RawString(prefix)
+		out.Bool(bool(in.Verified))
+	}
+	{
+		const prefix string = ",\"Banned\":"
+		out.RawString(prefix)
+		out.Bool(bool(in.Banned))
+	}
+	{
+		const prefix string = ",\"CreateDt\":"
+		out.RawString(prefix)
+		out.Raw((in.CreateDt).MarshalJSON())
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v User) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v User) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *User) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *User) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel(l, v)
+}
+func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel1(in *jlexer.Lexer, out *SignupConfirmCodeRequest) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		switch key {
+		case "email":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Email = string(in.String())
+			}
+		case "pwd":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Pwd = string(in.String())
+			}
+		case "code":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Code = string(in.String())
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel1(out *jwriter.Writer, in SignupConfirmCodeRequest) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"email\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.Email))
+	}
+	{
+		const prefix string = ",\"pwd\":"
+		out.RawString(prefix)
+		out.String(string(in.Pwd))
+	}
+	{
+		const prefix string = ",\"code\":"
+		out.RawString(prefix)
+		out.String(string(in.Code))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v SignupConfirmCodeRequest) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel1(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v SignupConfirmCodeRequest) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel1(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *SignupConfirmCodeRequest) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel1(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *SignupConfirmCodeRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel1(l, v)
+}
+func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel2(in *jlexer.Lexer, out *SignupCheckRequest) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -47,7 +267,7 @@ func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel(out *jwriter.Writer, in SignupCheckRequest) {
+func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel2(out *jwriter.Writer, in SignupCheckRequest) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -62,27 +282,27 @@ func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel(out *jwrit
 // MarshalJSON supports json.Marshaler interface
 func (v SignupCheckRequest) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel(&w, v)
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v SignupCheckRequest) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel(w, v)
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *SignupCheckRequest) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel(&r, v)
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *SignupCheckRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel(l, v)
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel2(l, v)
 }
-func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel1(in *jlexer.Lexer, out *Response) {
+func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel3(in *jlexer.Lexer, out *Response) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -126,7 +346,7 @@ func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel1(in *jlexe
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel1(out *jwriter.Writer, in Response) {
+func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel3(out *jwriter.Writer, in Response) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -157,23 +377,99 @@ func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel1(out *jwri
 // MarshalJSON supports json.Marshaler interface
 func (v Response) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel1(&w, v)
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Response) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel1(w, v)
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Response) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel1(&r, v)
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Response) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel1(l, v)
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel3(l, v)
+}
+func easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel4(in *jlexer.Lexer, out *GetQRCodeRequest) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		switch key {
+		case "email":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Email = string(in.String())
+			}
+		case "pwd":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Pwd = string(in.String())
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel4(out *jwriter.Writer, in GetQRCodeRequest) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"email\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.Email))
+	}
+	{
+		const prefix string = ",\"pwd\":"
+		out.RawString(prefix)
+		out.String(string(in.Pwd))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v GetQRCodeRequest) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel4(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v GetQRCodeRequest) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncodeGithubComMxmrykovPoloniumAuthInternalModel4(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *GetQRCodeRequest) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel4(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *GetQRCodeRequest) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecodeGithubComMxmrykovPoloniumAuthInternalModel4(l, v)
 }

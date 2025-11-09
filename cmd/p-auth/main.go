@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os/signal"
 	"syscall"
 	"time"
@@ -25,7 +27,7 @@ func main() {
 	}
 
 	go func() {
-		if err := application.Run(); err != nil {
+		if err := application.Run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			fmt.Println("error running app: ", err)
 		}
 	}()

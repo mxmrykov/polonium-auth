@@ -26,6 +26,7 @@ go.work.sum
 
 # env file
 migrations/.env
+./.env
 
 # Editor/IDE
  .idea/
