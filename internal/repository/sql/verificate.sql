@@ -1,0 +1,1 @@
+update users set verificated = true where email = $1

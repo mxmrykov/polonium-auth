@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	jwtAuth "github.com/mxmrykov/polonium-auth/internal/auth"
 	"github.com/mxmrykov/polonium-auth/internal/model"
 	"github.com/mxmrykov/polonium-auth/internal/repository"
 	"github.com/mxmrykov/polonium-auth/internal/vars"
@@ -20,13 +21,16 @@ type (
 		ConfirmCode(user, code string) error
 		SignupUnverified(ctx context.Context, user string, pwd string) error
 		VerifyUser(ctx context.Context, user, pwd string) error
+		CreateSession(user string) (string, string, error)
+		VerificateUser(ctx context.Context, user string) error
 	}
 
 	auth struct {
-		authPg  repository.IAuthPostgres
-		authRdb repository.IAuthRedis
-		emailer repository.IEmailer
-		vault   repository.IAuthVault
+		authPg     repository.IAuthPostgres
+		authRdb    repository.IAuthRedis
+		emailer    repository.IEmailer
+		vault      repository.IAuthVault
+		jProcessor *jwtAuth.JWTProcessor
 	}
 )
 
@@ -35,12 +39,14 @@ func NewAuth(
 	authRdb repository.IAuthRedis,
 	emailer repository.IEmailer,
 	vault repository.IAuthVault,
+	jProcessor *jwtAuth.JWTProcessor,
 ) IAuth {
 	return &auth{
-		authPg:  authPg,
-		authRdb: authRdb,
-		emailer: emailer,
-		vault:   vault,
+		authPg:     authPg,
+		authRdb:    authRdb,
+		emailer:    emailer,
+		vault:      vault,
+		jProcessor: jProcessor,
 	}
 }
 
@@ -165,4 +171,27 @@ func (a *auth) VerifyUser(ctx context.Context, user, pwd string) error {
 	}
 
 	return nil
+}
+
+func (a *auth) CreateSession(user string) (string, string, error) {
+	session := utils.NewSession()
+	if err := a.authRdb.NewAuthSession(user, session); err != nil {
+		return "", "", fmt.Errorf("cannot register new session: %v", err)
+	}
+
+	newAccess, err := a.jProcessor.GenerateAccessToken(user, session)
+	if err != nil {
+		return "", "", fmt.Errorf("cannot generate access token: %v", err)
+	}
+
+	newRefresh, err := a.jProcessor.GenerateRefreshToken(user, session)
+	if err != nil {
+		return "", "", fmt.Errorf("cannot generate refresh token: %v", err)
+	}
+
+	return newAccess, newRefresh, nil
+}
+
+func (a *auth) VerificateUser(ctx context.Context, user string) error {
+	return a.authPg.VerificateUser(ctx, user)
 }

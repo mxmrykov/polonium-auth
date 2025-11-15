@@ -42,7 +42,7 @@ func NewRSAJWTProcessor(
 	}
 }
 
-func (j *JWTProcessor) GenerateAccessToken(session, user string) (string, error) {
+func (j *JWTProcessor) GenerateAccessToken(user, session string) (string, error) {
 	now := time.Now()
 	claims := CustomClaims{
 		UserID:  user,

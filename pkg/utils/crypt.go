@@ -7,11 +7,10 @@ import (
 	"crypto/sha1"
 	"crypto/sha512"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
-	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/mxmrykov/polonium-auth/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,9 +26,10 @@ func CheckHash(val, hash string) bool {
 }
 
 func NewCert() string {
-	id := []byte(uuid.New().String())
-	sshDecoded := sha512.Sum512(id)
-	return convertToSymbolPairs(string(sshDecoded[:]), " ")
+	randomBytes := make([]byte, 32)
+	rand.Read(randomBytes)
+	hash := sha512.Sum512(randomBytes)
+	return hex.EncodeToString(hash[:])
 }
 
 func GetTOTPCodes(secret string, duration int) []string {
@@ -72,30 +72,4 @@ func generateTOTP(secret []byte, timeInterval int64) string {
 	binaryCode := binary.BigEndian.Uint32(hash[offset:offset+4]) & 0x7fffffff
 
 	return fmt.Sprintf("%06d", binaryCode%1000000)
-}
-
-func convertToSymbolPairs(s string, separator string) string {
-	if len(s) == 0 {
-		return ""
-	}
-
-	var result strings.Builder
-	length := len(s)
-
-	for i := 0; i < length; i += 2 {
-		end := i + 2
-		if end > length {
-			end = length
-		}
-
-		pair := s[i:end]
-
-		if i > 0 {
-			result.WriteString(separator)
-		}
-
-		result.WriteString(pair)
-	}
-
-	return result.String()
 }

@@ -14,6 +14,7 @@ type (
 	IAuthPostgres interface {
 		IsUserExists(ctx context.Context, email string) (bool, error)
 		Signup(ctx context.Context, user *model.User) error
+		VerificateUser(ctx context.Context, user string) error
 	}
 
 	authPostgres struct {
@@ -28,6 +29,9 @@ var (
 
 	//go:embed sql/signupUser.sql
 	signupUserQuery string
+
+	//go:embed sql/verificate.sql
+	verificateQuery string
 )
 
 func NewAuthPostgres(cfg *config.Psql) (IAuthPostgres, error) {
@@ -62,6 +66,20 @@ func (a *authPostgres) Signup(ctx context.Context, user *model.User) error {
 	if _, err := a.pg.GetConnect().Exec(
 		ctx, signupUserQuery,
 		user.Email, user.Id, false, false, user.SshSign, user.Deployer,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *authPostgres) VerificateUser(ctx context.Context, user string) error {
+	ctx, cancel := context.WithTimeout(ctx, a.connectionTtl)
+	defer cancel()
+
+	if _, err := a.pg.GetConnect().Exec(
+		ctx, verificateQuery,
+		user,
 	); err != nil {
 		return err
 	}

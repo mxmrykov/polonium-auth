@@ -26,24 +26,27 @@ func (a *Application) setupRoutesAPIV1(
 		apiV1.OPTIONS("*any", func(c *gin.Context) {
 			c.Writer.WriteHeader(http.StatusOK)
 		})
-		apiV1.Use(middlewares.AuthMW(jProcessor, repositories.authRdb))
+		//apiV1.Use(middlewares.AuthMW(jProcessor, repositories.authRdb))
 	}
 
 	// ---===Routing===---
 	{
 		signupGroup := apiV1.Group("/signup")
+		authGroup := apiV1.Group("/auth")
 		authService, totpService := service.NewAuth(
 			repositories.authPg,
 			repositories.authRdb,
 			repositories.emailer,
 			repositories.vault,
+			jProcessor,
 		), service.NewTOTP(repositories.vault)
 		extAuthHandlers := handlers.NewExtAuth(authService, totpService)
-
 		signupGroup.POST("/general/check", extAuthHandlers.SignupCheck)
 		signupGroup.POST("/email/check", extAuthHandlers.SignupConfirmEmail)
 		signupGroup.POST("/general/qr", extAuthHandlers.GetQRCode)
-		signupGroup.POST("/general/verify", extAuthHandlers.CompleteSignup)
+		signupGroup.POST("/general/verify", extAuthHandlers.Complete)
+		authGroup.POST("/validate", extAuthHandlers.Authorize)
+		authGroup.POST("/complete", extAuthHandlers.Complete)
 	}
 }
 
@@ -69,7 +72,7 @@ func (a *Application) initRepositories() (*repositories, error) {
 }
 
 func (a *Application) initJwtProcessor() (*auth.JWTProcessor, error) {
-	rsa, err := utils.GenerateRSAKeys(rand.Intn(999))
+	rsa, err := utils.GenerateRSAKeys(1100 + rand.Intn(899))
 	if err != nil {
 		return nil, fmt.Errorf("cannot init RSA keys: %v", err)
 	}

@@ -16,11 +16,10 @@ import (
 
 func AuthMW(jp *auth.JWTProcessor, authRdb repository.IAuthRedis) gin.HandlerFunc {
 	return func(context *gin.Context) {
-		access := context.Request.Header.Get(vars.HeaderAuthorization)
 		refresh, err := context.Request.Cookie(vars.CookiePoloniumAuth)
 		if err != nil {
 			log.Log().Msg("no polonium-auth token provided")
-			context.JSON(http.StatusUnauthorized, model.Response{
+			context.AbortWithStatusJSON(http.StatusUnauthorized, model.Response{
 				Error: "No polonium-auth token provided",
 			})
 			return
@@ -30,25 +29,26 @@ func AuthMW(jp *auth.JWTProcessor, authRdb repository.IAuthRedis) gin.HandlerFun
 		if err != nil {
 			log.Log().Msg("cannot verify refresh token")
 			if errors.Is(err, jwt.ErrTokenExpired) {
-				context.JSON(http.StatusUnauthorized, model.Response{
+				context.AbortWithStatusJSON(http.StatusUnauthorized, model.Response{
 					Error: "Session expired",
 				})
 				return
 			}
 
-			context.JSON(http.StatusUnauthorized, model.Response{
+			context.AbortWithStatusJSON(http.StatusUnauthorized, model.Response{
 				Error: "Invalid token",
 			})
 			return
 		}
 
+		access := context.Request.Header.Get(vars.HeaderAuthorization)
 		if _, err = jp.TokenVerify(access); err != nil {
 			log.Log().Msg("cannot verify access token")
 			if errors.Is(err, jwt.ErrTokenExpired) {
 				log.Log().Msg("renewing access token")
-				session := utils.NewCert()
+				session := utils.NewSession()
 				if err := authRdb.NewAuthSession(claims.UserID, session); err != nil {
-					context.JSON(http.StatusServiceUnavailable, model.Response{
+					context.AbortWithStatusJSON(http.StatusServiceUnavailable, model.Response{
 						Error: "Cannot renew token",
 					})
 					return
@@ -56,7 +56,7 @@ func AuthMW(jp *auth.JWTProcessor, authRdb repository.IAuthRedis) gin.HandlerFun
 
 				newAccess, err := jp.GenerateAccessToken(claims.UserID, session)
 				if err != nil {
-					context.JSON(http.StatusServiceUnavailable, model.Response{
+					context.AbortWithStatusJSON(http.StatusServiceUnavailable, model.Response{
 						Error: "Cannot renew token",
 					})
 					return
@@ -69,7 +69,7 @@ func AuthMW(jp *auth.JWTProcessor, authRdb repository.IAuthRedis) gin.HandlerFun
 				return
 			}
 
-			context.JSON(http.StatusUnauthorized, model.Response{
+			context.AbortWithStatusJSON(http.StatusUnauthorized, model.Response{
 				Error: "Invalid access token",
 			})
 			return

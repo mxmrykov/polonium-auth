@@ -9,17 +9,16 @@ import (
 
 type (
 	PAuth struct {
-		Server Server
-		Psql   Psql
-		Smtp   Smtp
-		Redis  Redis
-		Vault  Vault
-		Auth   Auth
+		PublicServer, PrivateServer Server
+		Psql                        Psql
+		Smtp                        Smtp
+		Redis                       Redis
+		Vault                       Vault
+		Auth                        Auth
 	}
 
 	Auth struct {
 		Issuer          string
-		TokenSecret     string
 		CertSecret      string
 		Access, Refresh time.Duration
 		CertExp         time.Duration
@@ -50,12 +49,12 @@ type (
 
 func Init() *PAuth {
 	return &PAuth{
-		Server: Server{Port: ":8080"},
-		Psql:   loadPsql(),
-		Smtp:   loadSmtp(),
-		Redis:  loadRedis(),
-		Vault:  loadVault(),
-		Auth:   loadAuth(),
+		PublicServer: Server{Port: ":8080"},
+		Psql:         loadPsql(),
+		Smtp:         loadSmtp(),
+		Redis:        loadRedis(),
+		Vault:        loadVault(),
+		Auth:         loadAuth(),
 	}
 }
 
@@ -94,12 +93,11 @@ func loadVault() Vault {
 
 func loadAuth() Auth {
 	return Auth{
-		Issuer:      envDefault[string]("APP_AUTH_ISSUER", "polonium-authorization"),
-		TokenSecret: envRequired[string]("APP_AUTH_TOKEN_SECRET"),
-		CertSecret:  envRequired[string]("APP_AUTH_CERT_SECRET"),
-		Access:      envDefault[time.Duration]("APP_ACCESS_TTL", time.Minute),
-		Refresh:     envDefault[time.Duration]("APP_REFRESH_TTL", time.Hour),
-		CertExp:     envDefault[time.Duration]("APP_CERT_TTL", time.Hour),
+		Issuer:     envDefault[string]("APP_AUTH_ISSUER", "polonium-authorization"),
+		CertSecret: envRequired[string]("APP_AUTH_CERT_SECRET"),
+		Access:     envDefault[time.Duration]("APP_ACCESS_TTL", time.Minute),
+		Refresh:    envDefault[time.Duration]("APP_REFRESH_TTL", time.Hour),
+		CertExp:    envDefault[time.Duration]("APP_CERT_TTL", time.Hour),
 	}
 }
 

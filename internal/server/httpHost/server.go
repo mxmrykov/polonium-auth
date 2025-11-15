@@ -2,6 +2,7 @@ package httpHost
 
 import (
 	"context"
+	"crypto/tls"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,18 +23,24 @@ type (
 	}
 )
 
-func New(cfg *config.PAuth) IServer {
+func New(cfg *config.PAuth, TLS ...*tls.Config) IServer {
 	router := gin.New()
 	server := &http.Server{
-		Addr:    cfg.Server.Port,
+		Addr:    cfg.PublicServer.Port,
 		Handler: router,
 	}
 
-	return &Server{
+	s := &Server{
 		cfg:    cfg,
 		server: server,
 		router: router,
 	}
+
+	if len(TLS) > 0 && TLS[0] != nil {
+		s.server.TLSConfig = TLS[0]
+	}
+
+	return s
 }
 
 func (s *Server) Start() error {
